@@ -1241,3 +1241,64 @@ p {
 .form-fallback {
   margin: 0;
 }
+
+/* ------------------------------------------------------------------
+   The depth ladder
+   ------------------------------------------------------------------
+   Sits under the demonstration, not above it: the fragments converging
+   into a noticing show that Beacon finds *a* thing; the ladder is the
+   argument that it keeps finding more. Feeling first, structure after.
+
+   Deliberately the same editorial-row treatment as .steps — hairlines,
+   no cards — because these are the same kind of object. The timeframe
+   takes the accent colour that .step-n uses for its numeral, so the
+   eye reads them as a series rather than as two unrelated lists.
+   ------------------------------------------------------------------ */
+
+.ladder {
+  list-style: none;
+  margin: 56px 0 0;
+  padding: 0;
+  /* Matches .thread — the band is full-bleed, the reading column is not. */
+  max-width: 660px;
+}
+
+.ladder li {
+  display: grid;
+  gap: 6px 28px;
+  padding: 26px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.ladder li:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+/* Two columns only once there's room for the timeframe to sit beside
+   the copy without squeezing it — below this it stacks, which reads
+   fine as a label above its own paragraph. */
+@media (min-width: 720px) {
+  .ladder li {
+    grid-template-columns: 10.5rem 1fr;
+    align-items: baseline;
+  }
+}
+
+.ladder-when {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--ember);
+}
+
+.ladder h3 {
+  margin-bottom: 8px;
+}
+
+/* Scoped past .ladder-when so the timeframe keeps its own size/colour. */
+.ladder div p {
+  font-size: 0.9375rem;
+  max-width: 46ch;
+}

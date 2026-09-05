@@ -2,3 +2,4 @@
 # versions beside them; these are kept locally as the source masters.
 assets/*-raw.png
 .DS_Store
+.vercel
