@@ -1,0 +1,4 @@
+# Unoptimised screenshot originals — the page loads the exported
+# versions beside them; these are kept locally as the source masters.
+assets/*-raw.png
+.DS_Store

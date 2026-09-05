@@ -1,0 +1,1243 @@
+/* ==================================================================
+   Beacon — marketing site
+   ------------------------------------------------------------------
+   Design language is inherited directly from the app's "Obsidian
+   Sanctuary" theme, not reinvented: true near-black ground, a single
+   indigo/blue-violet accent, refined serif for anything a person is
+   meant to *feel*, plain sans for structure and UI. One theme only —
+   the app has no light mode, so neither does this.
+
+   Type stack note: the display serif prefers Iowan Old Style and
+   Hoefler Text, which ship on Apple platforms — i.e. on the exact
+   devices someone researching an iOS app is most likely holding. That
+   buys a genuinely editorial serif for zero network requests, which
+   matters more than usual on a site whose entire pitch is privacy.
+   ================================================================== */
+
+:root {
+  --void: #050508;
+  --raise: #0b0b12;
+  --hairline: rgba(255, 255, 255, 0.07);
+  --hairline-strong: rgba(255, 255, 255, 0.14);
+
+  --bone: #f4f5fa;
+  --mist: #a8acc2;
+  --quiet: #7b7f96;
+
+  --ember: #5c63ff;
+  --glow: #a2a7ff;
+  --core: #eef0ff;
+
+  --display: "Iowan Old Style", "Hoefler Text", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* Text stays on a tight measure no matter how wide the viewport gets —
+     the page grows around the words, the words don't stretch. */
+  --measure: 660px;
+  --measure-wide: 940px;
+  --gutter: 24px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--glow);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--raise);
+  color: var(--bone);
+  padding: 12px 18px;
+  border-radius: 0 0 10px 0;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* ------------------------------------------------------------------
+   Scroll reveal — progressive enhancement only. The `js` class is set
+   by an inline script before paint, so with JS disabled or broken the
+   content is simply visible rather than permanently hidden.
+   ------------------------------------------------------------------ */
+
+.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.js [data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Shell
+   ------------------------------------------------------------------ */
+
+.wrap {
+  width: 100%;
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+/* For composition-led blocks (the timeline) that should breathe wider
+   than body copy. The text inside still carries its own max-width, so
+   line length never follows the container. */
+.wrap-wide {
+  max-width: var(--measure-wide);
+}
+
+/* ------------------------------------------------------------------
+   Page atmosphere — fixed, full-viewport, sits behind everything. This
+   is what stops a narrow text column from reading as a card floating
+   on a black page: the light belongs to the whole window, and the
+   column is simply where the words happen to sit inside it.
+   ------------------------------------------------------------------ */
+
+.bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg::before {
+  /* the wash the hero orb throws across the entire top of the window */
+  content: "";
+  position: absolute;
+  top: -34vh;
+  left: 50%;
+  width: min(1500px, 145vw);
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    circle,
+    rgba(92, 99, 255, 0.12) 0%,
+    rgba(70, 76, 200, 0.05) 34%,
+    transparent 62%
+  );
+}
+
+.bg::after {
+  /* edge vignette — pulls the corners down so the composition reads as
+     a lit space rather than a flat black rectangle */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 120% 80% at 50% 35%, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+}
+
+.site-header {
+  position: relative;
+  z-index: 3;
+  padding: 26px 0;
+}
+
+/* Header and footer run wider than the text measure. Chrome pinned to
+   the outer edges is a large part of what makes a page feel like a
+   window rather than a document. */
+.site-header .wrap,
+.site-footer .wrap {
+  max-width: var(--measure-wide);
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 590;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+}
+
+/* The small mark repeats the big orb's logic in miniature: light
+   concentrated off-centre, dark at the rim. Never a flat dot. */
+.mark {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  flex: none;
+  background: radial-gradient(circle at 36% 32%, var(--core) 0%, #9ea4ff 20%, var(--ember) 46%, #16173f 88%);
+  box-shadow: 0 0 10px rgba(92, 99, 255, 0.5);
+}
+
+.site-nav {
+  display: flex;
+  gap: 22px;
+  font-size: 13.5px;
+}
+
+.site-nav a {
+  color: var(--quiet);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+  color: var(--bone);
+}
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------------
+   Typography
+   ------------------------------------------------------------------ */
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  color: var(--bone);
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(2.6rem, 7.2vw, 4.15rem);
+  line-height: 1.04;
+  letter-spacing: -0.022em;
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4.4vw, 2.35rem);
+  line-height: 1.16;
+  letter-spacing: -0.018em;
+}
+
+h3 {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+  color: var(--mist);
+}
+
+.label {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--quiet);
+  margin: 0;
+}
+
+.lede {
+  font-size: clamp(1.0625rem, 2.4vw, 1.1875rem);
+  line-height: 1.62;
+  color: var(--mist);
+  max-width: 43ch;
+}
+
+/* ------------------------------------------------------------------
+   Hero — one composition, not a stack. The orb is the first thing that
+   happens on the page; the headline sits inside the light it throws.
+   ------------------------------------------------------------------ */
+
+.hero {
+  position: relative;
+  padding: clamp(20px, 4vw, 48px) 0 clamp(88px, 13vw, 150px);
+  text-align: center;
+  isolation: isolate;
+}
+
+/* Full-bleed by design: the stage is never constrained by the text
+   measure, so the orb and the light it throws run to the edges of the
+   window instead of stopping at a column boundary. */
+.hero-stage {
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: clamp(-46px, -5vw, -24px);
+}
+
+/* The orb ---------------------------------------------------------- */
+
+.orb {
+  position: relative;
+  width: clamp(240px, 34vw, 440px);
+  aspect-ratio: 1;
+  animation: orb-drift 19s ease-in-out infinite;
+}
+
+/* Ambient bloom the sphere casts into the page. Dim and wide on
+   purpose — a halo ring would read as a button, this reads as light
+   leaving glass. */
+.orb::after {
+  content: "";
+  position: absolute;
+  /* Wide enough to run past the window edges on phones and to fill the
+     upper third of a desktop composition — the glow is scenery, not a
+     halo pinned to the sphere. */
+  inset: -110%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(92, 99, 255, 0.26) 0%,
+    rgba(82, 88, 230, 0.12) 26%,
+    rgba(64, 70, 195, 0.05) 44%,
+    transparent 66%
+  );
+  filter: blur(40px);
+  z-index: -1;
+  animation: orb-bloom 13s ease-in-out infinite;
+}
+
+/* Sphere body: light concentrated off-centre, falling to near-black at
+   the rim — the same conical-gradient logic the app's Skia orb uses.
+   `overflow: hidden` is what keeps the internal drift layers *inside*
+   the glass, exactly like the app clipping its blooms to the sphere. */
+.orb-body {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 37% 31%,
+    var(--core) 0%,
+    #c3c7ff 6%,
+    #7d84ff 17%,
+    #4950e0 30%,
+    #2a2d80 45%,
+    #171a4d 60%,
+    #0c0e28 76%,
+    #06070f 92%
+  );
+  box-shadow:
+    inset 0 0 50px 14px rgba(3, 3, 10, 0.8),
+    inset -18px -22px 70px 10px rgba(2, 2, 8, 0.85),
+    0 30px 80px -34px rgba(92, 99, 255, 0.45);
+  animation: orb-breathe 11s ease-in-out infinite;
+}
+
+/* Two internal light masses drifting at incommensurate speeds. Because
+   the periods don't divide evenly the combined motion never visibly
+   repeats — the same reason the app sums sine waves at odd frequencies
+   instead of looping an animation. This is the "cut-through", kept
+   entirely within the glass. */
+.orb-drift-a,
+.orb-drift-b {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(22px);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.orb-drift-a {
+  inset: 6% 12% 22% 4%;
+  background: radial-gradient(circle at 40% 40%, rgba(190, 196, 255, 0.55) 0%, rgba(92, 99, 255, 0.16) 46%, transparent 70%);
+  animation: drift-a 17s ease-in-out infinite;
+}
+
+.orb-drift-b {
+  inset: 26% 6% 6% 20%;
+  background: radial-gradient(circle at 55% 50%, rgba(120, 128, 255, 0.4) 0%, rgba(60, 66, 190, 0.12) 50%, transparent 72%);
+  animation: drift-b 23s ease-in-out infinite;
+}
+
+/* A hard, tiny filament at the light source. Real light has a source;
+   without this the sphere reads as fog. */
+.orb-core {
+  position: absolute;
+  top: 30%;
+  left: 34%;
+  width: 9%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  filter: blur(3px);
+  opacity: 0.85;
+  animation: orb-breathe 11s ease-in-out infinite;
+}
+
+/* Glass rim — a barely-there highlight along the top edge that sells
+   "sphere" rather than "circle". */
+.orb-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, transparent 34%);
+  mask: radial-gradient(circle, transparent 0%, transparent 88%, #000 89%);
+  -webkit-mask: radial-gradient(circle, transparent 0%, transparent 88%, #000 89%);
+}
+
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.028); }
+}
+
+@keyframes orb-drift {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes orb-bloom {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
+
+@keyframes drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%      { transform: translate3d(9%, 7%, 0) scale(1.1); }
+  66%      { transform: translate3d(-6%, 4%, 0) scale(0.95); }
+}
+
+@keyframes drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  40%      { transform: translate3d(-8%, -6%, 0) scale(1.12); }
+  75%      { transform: translate3d(5%, -3%, 0) scale(0.94); }
+}
+
+/* Device mockups — real product screenshots, not staged. Kept out of
+   the layout at every width where they'd have to compete with the
+   text column for room; they're supporting proof for a sighted reader
+   on a spacious screen, never load-bearing for understanding the
+   page, so hiding them below their breakpoint costs nothing. */
+
+.phone {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 402 / 874;
+  border-radius: 34px;
+  padding: 8px;
+  background: linear-gradient(155deg, #34364c 0%, #101018 42%, #050508 100%);
+  box-shadow:
+    0 50px 90px -34px rgba(0, 0, 0, 0.75),
+    0 10px 40px -20px rgba(92, 99, 255, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.phone-screen {
+  position: absolute;
+  inset: 8px;
+  border-radius: 27px;
+  overflow: hidden;
+  background: var(--void);
+}
+
+.phone-screen img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+
+.phone-island {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 7px;
+  border-radius: 999px;
+  background: #000;
+  z-index: 2;
+}
+
+/* Hero pair — hidden entirely below 640px so the mobile hero stays
+   exactly the single-orb composition it was already tuned as; the
+   second, further one only earns its keep once there's real width. */
+.hero-phone {
+  position: absolute;
+  top: 50%;
+  width: clamp(150px, 15vw, 200px);
+  pointer-events: none;
+  display: none;
+}
+
+.hero-phone-primary {
+  right: clamp(-6px, 3vw, 54px);
+  transform: translateY(-48%) rotate(-6deg);
+  z-index: 2;
+}
+
+.hero-phone-secondary {
+  left: clamp(-10px, 1vw, 24px);
+  width: clamp(120px, 12vw, 165px);
+  transform: translateY(-38%) rotate(6deg);
+  z-index: 0;
+  opacity: 0.5;
+}
+
+@media (min-width: 640px) {
+  .hero-phone-primary {
+    display: block;
+  }
+}
+
+@media (min-width: 1040px) {
+  .hero-phone-secondary {
+    display: block;
+  }
+}
+
+/* Section-edge mockups — large desktop only, anchored well outside the
+   text measure so a mockup never sits under a line of copy. */
+.edge-phone {
+  position: absolute;
+  top: 50%;
+  width: clamp(140px, 10vw, 190px);
+  display: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.thread-phone {
+  right: clamp(16px, 3vw, 64px);
+  transform: translateY(-50%) rotate(4deg);
+}
+
+.settings-phone {
+  left: clamp(16px, 3vw, 64px);
+  transform: translateY(-50%) rotate(-4deg);
+}
+
+@media (min-width: 1440px) {
+  .edge-phone {
+    display: block;
+  }
+}
+
+/* Hero copy -------------------------------------------------------- */
+
+.hero-copy {
+  position: relative;
+  z-index: 2;
+}
+
+.hero h1 {
+  margin: 0 auto;
+  max-width: 15ch;
+}
+
+.hero .lede {
+  margin: 26px auto 0;
+  text-wrap: pretty;
+}
+
+.hero-actions {
+  margin-top: 38px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.hero-note {
+  margin-top: 20px;
+  font-size: 0.8125rem;
+  color: var(--quiet);
+}
+
+/* ------------------------------------------------------------------
+   Buttons
+   ------------------------------------------------------------------ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 26px;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background 180ms ease, box-shadow 220ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.btn-primary {
+  background: var(--ember);
+  color: #fff;
+  box-shadow: 0 6px 30px -8px rgba(92, 99, 255, 0.7);
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: #6b71ff;
+  box-shadow: 0 8px 38px -6px rgba(92, 99, 255, 0.85);
+}
+
+.btn-quiet {
+  border-color: var(--hairline-strong);
+  color: var(--mist);
+}
+
+.btn-quiet:hover,
+.btn-quiet:focus-visible {
+  color: var(--bone);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* Placeholder state, until a real store link is wired in. Fading the
+   whole button to 50% turns white-on-indigo into an unreadable mush;
+   muting the fill instead keeps text contrast high while still reading
+   as "not live yet". */
+.btn-primary[aria-disabled="true"] {
+  background: #2f3280;
+  color: #c9ccf5;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.link {
+  color: var(--glow);
+  text-decoration: underline;
+  text-decoration-color: rgba(162, 167, 255, 0.32);
+  text-underline-offset: 3px;
+  transition: text-decoration-color 160ms ease;
+}
+
+.link:hover,
+.link:focus-visible {
+  text-decoration-color: var(--glow);
+}
+
+/* ------------------------------------------------------------------
+   Sections — rhythm varies deliberately; dividers are rare, not
+   automatic, so the ones that exist mean something.
+   ------------------------------------------------------------------ */
+
+.section {
+  position: relative;
+  padding: clamp(76px, 12vw, 128px) 0;
+}
+
+/* Full-bleed divider that fades out before it reaches either edge. A
+   hard edge-to-edge line reads like a table border; a line that
+   dissolves into the dark reads like the room continuing past the
+   frame — which is the whole point of not feeling boxed in. */
+.section-rule::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--hairline) 18%,
+    var(--hairline-strong) 50%,
+    var(--hairline) 82%,
+    transparent 100%
+  );
+}
+
+/* A full-bleed band that gives one section its own room. Used for the
+   timeline, which is the page's centrepiece and earns the emphasis. */
+.band {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(92, 99, 255, 0.07) 0%, transparent 70%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.014) 0%, transparent 55%);
+}
+
+.section-head {
+  margin-bottom: clamp(40px, 6vw, 60px);
+}
+
+.section-head h2 {
+  margin-top: 14px;
+  max-width: 18ch;
+}
+
+.section-head .lede {
+  margin-top: 20px;
+}
+
+/* Steps — editorial rows, not boxed cards. The numeral is set in the
+   display face at a size that makes it a typographic element rather
+   than a badge. */
+.steps {
+  display: grid;
+  gap: 0;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr;
+  gap: 4px 20px;
+  padding: 26px 0;
+  border-top: 1px solid var(--hairline);
+  align-items: baseline;
+}
+
+.step:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.step-n {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--ember);
+  font-variant-numeric: lining-nums;
+}
+
+.step h3 {
+  margin-bottom: 6px;
+}
+
+.step p {
+  grid-column: 2;
+  font-size: 0.9375rem;
+  max-width: 46ch;
+}
+
+/* ------------------------------------------------------------------
+   The accumulation — the one section that *demonstrates* the product
+   instead of describing it: quiet dated fragments running down a
+   hairline, converging into a single lit noticing.
+   ------------------------------------------------------------------ */
+
+.thread {
+  position: relative;
+  padding-left: 30px;
+  /* The band around it is full-bleed; the reading column inside it is
+     not. Widening this with the container would be the exact mistake
+     the full-width treatment is meant to avoid. */
+  max-width: 660px;
+}
+
+.thread::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 6px;
+  bottom: 96px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--hairline-strong) 12%,
+    var(--hairline-strong) 62%,
+    rgba(92, 99, 255, 0.55) 100%
+  );
+}
+
+.fragment {
+  position: relative;
+  padding-bottom: 26px;
+}
+
+.fragment::before {
+  content: "";
+  position: absolute;
+  left: -30px;
+  top: 9px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2a2c40;
+  box-shadow: 0 0 0 4px var(--void);
+}
+
+.fragment time {
+  display: block;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--quiet);
+  margin-bottom: 5px;
+}
+
+.fragment p {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: 1.0625rem;
+  line-height: 1.5;
+  color: #9296ad;
+  max-width: 40ch;
+}
+
+/* The noticing — same left rail, but the node lights up and the type
+   steps up in weight and brightness. The visual payoff is earned by
+   the four quiet fragments above it. */
+.noticing {
+  position: relative;
+  margin-top: 14px;
+  padding: 28px 28px 30px;
+  border: 1px solid var(--hairline);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(92, 99, 255, 0.055) 0%, rgba(11, 11, 18, 0.6) 60%);
+  /* Deliberately NOT overflow:hidden — the lit node below sits outside
+     this box, on the rail, and clipping is what makes the whole
+     "fragments converge into a noticing" idea fall apart. The gradient
+     respects border-radius on its own. */
+}
+
+.noticing::before {
+  content: "";
+  position: absolute;
+  left: -34px;
+  top: 34px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, var(--core) 0%, var(--ember) 55%, #1a1b4a 100%);
+  box-shadow: 0 0 14px 2px rgba(92, 99, 255, 0.75), 0 0 0 4px var(--void);
+}
+
+.noticing-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--glow);
+  margin-bottom: 14px;
+}
+
+.noticing h3 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.noticing-text {
+  font-family: var(--display);
+  font-style: italic;
+  font-size: clamp(1.0625rem, 2.4vw, 1.1875rem);
+  line-height: 1.6;
+  color: #dee0f0;
+  text-wrap: pretty;
+}
+
+.thread-caption {
+  margin-top: 26px;
+  padding-left: 30px;
+  font-size: 0.8125rem;
+  color: var(--quiet);
+  max-width: 52ch;
+}
+
+/* ------------------------------------------------------------------
+   Privacy — three specific, checkable facts. Vague trust copy is
+   worse than none; each of these describes something the app actually
+   does.
+   ------------------------------------------------------------------ */
+
+.facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.facts li {
+  padding: 24px 0;
+  border-top: 1px solid var(--hairline);
+  display: grid;
+  gap: 6px;
+}
+
+.facts li:last-child {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.facts strong {
+  font-family: var(--display);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  color: var(--bone);
+}
+
+.facts p {
+  font-size: 0.9375rem;
+  max-width: 52ch;
+}
+
+/* ------------------------------------------------------------------
+   Closing
+   ------------------------------------------------------------------ */
+
+.closing {
+  text-align: center;
+  padding: clamp(90px, 14vw, 150px) 0 clamp(76px, 10vw, 110px);
+  position: relative;
+}
+
+/* Full-bleed closing glow — the light comes back up across the whole
+   window to close the page the way the hero opened it. */
+.closing::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -60px;
+  width: min(1400px, 130vw);
+  height: 460px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(92, 99, 255, 0.16) 0%, transparent 68%);
+  pointer-events: none;
+}
+
+.closing h2 {
+  max-width: 17ch;
+  margin: 0 auto;
+  position: relative;
+}
+
+.closing .hero-actions {
+  margin-top: 34px;
+}
+
+/* ------------------------------------------------------------------
+   Footer
+   ------------------------------------------------------------------ */
+
+.site-footer {
+  border-top: 1px solid var(--hairline);
+  padding: 34px 0 44px;
+}
+
+.site-footer .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px 24px;
+  font-size: 0.8125rem;
+  color: var(--quiet);
+}
+
+.site-footer nav {
+  display: flex;
+  gap: 20px;
+}
+
+.site-footer a {
+  color: var(--quiet);
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.site-footer a:hover,
+.site-footer a:focus-visible {
+  color: var(--mist);
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+/* ------------------------------------------------------------------
+   Document pages (support / privacy)
+   ------------------------------------------------------------------ */
+
+.doc-header {
+  padding: clamp(56px, 10vw, 86px) 0 0;
+}
+
+.doc-header h1 {
+  font-size: clamp(2.1rem, 5.4vw, 2.9rem);
+  max-width: 18ch;
+  margin-top: 14px;
+}
+
+.doc-header .lede {
+  margin-top: 22px;
+}
+
+.doc {
+  max-width: 620px;
+  padding: clamp(44px, 7vw, 64px) 0 0;
+}
+
+.doc h2 {
+  font-size: 1.3125rem;
+  margin: 44px 0 12px;
+}
+
+.doc h2:first-child {
+  margin-top: 0;
+}
+
+.doc p {
+  margin-bottom: 16px;
+  font-size: 0.9688rem;
+}
+
+.doc ul {
+  margin: 0 0 18px;
+  padding-left: 18px;
+  color: var(--mist);
+  font-size: 0.9688rem;
+}
+
+.doc li {
+  margin-bottom: 7px;
+}
+
+.doc li::marker {
+  color: var(--quiet);
+}
+
+.meta {
+  font-size: 0.8125rem;
+  color: var(--quiet);
+  margin-top: 18px;
+}
+
+.contact-grid {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.contact-grid li {
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: var(--raise);
+  /* Grid, not inline flow: `.label` is applied to a <span> here, so a
+     plain margin-bottom would do nothing and the label would run into
+     the value on the same line. */
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.contact-grid span:last-child {
+  font-size: 0.9688rem;
+  color: var(--bone);
+}
+
+.ph {
+  font-family: var(--mono);
+  font-size: 0.9em;
+  color: var(--glow);
+  background: rgba(92, 99, 255, 0.11);
+  border: 1px solid rgba(92, 99, 255, 0.2);
+  padding: 1px 7px;
+  border-radius: 5px;
+  white-space: nowrap;
+}
+
+.doc-nav {
+  display: flex;
+  gap: 22px;
+  margin-top: 52px;
+  padding-top: 26px;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.9063rem;
+}
+
+/* ------------------------------------------------------------------
+   Wider viewports — the measure stays narrow on purpose. Long lines
+   are the fastest way to make careful writing feel careless.
+   ------------------------------------------------------------------ */
+
+@media (min-width: 900px) {
+  :root {
+    --measure: 700px;
+  }
+
+  .step {
+    grid-template-columns: 4rem 1fr;
+    padding: 30px 0;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Founding access — the conversion surface
+   ------------------------------------------------------------------
+   Added when the site stopped being a brochure and started being a
+   waitlist. Everything above this line existed to build enough trust
+   that this section gets read; it is the only place on the page that
+   asks for anything.
+   ------------------------------------------------------------------ */
+
+/* Scarcity badge. Sits above the h1 and is the first thing read, so it
+   stays quiet — the claim does the work, not the styling. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 22px;
+  padding: 7px 15px 7px 13px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--mist);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 12px 1px rgba(162, 167, 255, 0.75);
+  animation: badge-pulse 3.6s ease-in-out infinite;
+}
+
+/* Deliberately slow — this is the orb's respiration, not a
+   notification dot. A fast blink would read as an alert. */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-dot { animation: none; }
+}
+
+/* Header CTA. Quieter than the hero button on purpose — it's a
+   persistent fallback for someone who scrolled past, not the ask. */
+.nav-cta {
+  padding: 7px 16px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 999px;
+  color: var(--bone) !important;
+}
+
+.nav-cta:hover,
+.nav-cta:focus-visible {
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+@media (max-width: 520px) {
+  /* On a narrow screen the nav can't hold three items without
+     wrapping into the brand. The doc links survive in the footer. */
+  .site-nav a:not(.nav-cta) { display: none; }
+}
+
+.access {
+  scroll-margin-top: 24px;
+}
+
+/* The three terms of the deal, stated before the form rather than
+   after it — nobody should have to submit to find out what they get. */
+.terms {
+  list-style: none;
+  margin: 40px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 26px;
+}
+
+@media (min-width: 760px) {
+  .terms {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+}
+
+.terms li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.terms strong {
+  font-family: var(--display);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  color: var(--bone);
+  letter-spacing: -0.01em;
+}
+
+.terms span {
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--quiet);
+}
+
+/* The embed sits on the void with no card around it — a bordered box
+   here would be the only card on the entire page. The iframe is
+   transparent (transparentBackground=1) so Tally's own ground never
+   shows through as a lighter rectangle. */
+.form-frame {
+  margin-top: 46px;
+  min-height: 420px;
+}
+
+.form-frame iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color-scheme: dark;
+}
+
+.form-fallback {
+  margin: 0;
+}
