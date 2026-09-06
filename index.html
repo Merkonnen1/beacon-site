@@ -6,10 +6,28 @@
 <title>Beacon — A private voice journal</title>
 <meta name="description" content="Beacon is a private voice journal. Speak for a minute a day; over weeks it notices the patterns running underneath what you said." />
 <meta name="theme-color" content="#050508" />
+<link rel="canonical" href="https://beacon-site.vercel.app/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Beacon" />
+<meta property="og:url" content="https://beacon-site.vercel.app/" />
 <meta property="og:title" content="Beacon — A private voice journal" />
 <meta property="og:description" content="A private voice journal. Speak freely; notice what repeats. Private beta — 500 founding members." />
+<meta property="og:image" content="https://beacon-site.vercel.app/assets/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Beacon — Speak freely. Notice what repeats." />
 <meta name="twitter:card" content="summary_large_image" />
-<meta property="og:type" content="website" />
+<meta name="twitter:title" content="Beacon — A private voice journal" />
+<meta name="twitter:description" content="Speak freely; notice what repeats. Private beta — 500 founding members." />
+<meta name="twitter:image" content="https://beacon-site.vercel.app/assets/og.png" />
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="icon" href="/assets/icon-32.png" sizes="32x32" type="image/png" />
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<link rel="preconnect" href="https://tally.so" crossorigin />
 <link rel="stylesheet" href="styles.css" />
 <script>document.documentElement.className += " js";</script>
 </head>
@@ -59,18 +77,17 @@
     </div>
 
     <div class="wrap hero-copy">
-      <p class="badge"><span class="badge-dot" aria-hidden="true"></span>Private beta · 500 founding members</p>
-      <h1>Speak freely.<br />Notice what repeats.</h1>
+      <p class="badge"><span class="badge-dot" aria-hidden="true"></span>Private beta · 500 founding spots</p>
+      <h1>Say the thing you can't say out loud.</h1>
       <p class="lede">
-        Beacon is a private voice journal. Talk for a minute; it transcribes and keeps
-        what you said. From the first entry it's building — and within weeks it names
-        what you keep circling.
+        Speak for one minute. Beacon reads you from
+        the first word — and deeper every time.
       </p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#access">Request access</a>
-        <a class="btn btn-quiet" href="#how">How it works</a>
       </div>
-      <p class="hero-note">iPhone · Free during the beta · £79/year when it opens</p>
+      <p class="hero-note">Free during the beta · No card · iPhone</p>
+      <p class="hero-secondary"><a href="#how">How it works</a></p>
     </div>
   </section>
 
@@ -96,7 +113,7 @@
         <div class="step">
           <span class="step-n" aria-hidden="true">03</span>
           <h3>Notice</h3>
-          <p>The moment something has genuinely repeated, Beacon names it — grounded in your own entries, never in a guess.</p>
+          <p>Beacon decodes your subtext. It connects the dots you've been ignoring, and holds up a mirror to the thoughts you didn't know you had.</p>
         </div>
       </div>
     </div>
@@ -153,6 +170,11 @@
         </div>
       </div>
 
+      <p class="thread-caption">
+        An illustration, not a real person's journal — but the shape is real.
+        Beacon draws only on your own entries, and quotes them back as the
+        evidence for anything it says.
+      </p>
 
       <ol class="ladder" data-reveal>
         <li>
@@ -171,9 +193,9 @@
           <div>
             <h3>It names the thing.</h3>
             <p>
-              Once something has recurred across enough entries, and enough separate days,
-              to be more than coincidence, Beacon says it plainly — and shows you the
-              entries it built the case from.
+              The patterns get undeniable. Beacon stops you in your tracks, naming the
+              exact fears and motivations you've been hiding from yourself — and shows
+              you the entries that prove it.
             </p>
           </div>
         </li>
@@ -190,9 +212,8 @@
         </li>
       </ol>
       <p class="thread-caption">
-        An illustration, not a real person's journal. Beacon draws only on your own
-        entries and quotes them back as the evidence. It doesn't guess early — it tells
-        you what it's certain of, and certainty compounds.
+        It doesn't guess early. It tells you what it's certain of — and certainty
+        compounds.
       </p>
     </div>
   </section>
@@ -252,21 +273,109 @@
       </ul>
 
       <div class="form-frame" data-reveal>
+        <!-- `src` is set here, not left to embed.js to swap in from a
+             data- attribute. The embed script is loaded `async`, so it
+             routinely arrives after its own DOMContentLoaded hook has
+             fired and never initialises the frame — which left this,
+             the only place on the site that asks for anything, as a
+             620px blank rectangle. The script is still loaded below,
+             but now it only *upgrades* a form that already works: it
+             adds dynamic height so the frame tracks the form's real
+             size instead of holding a fixed 620px. -->
         <iframe
-          data-tally-src="https://tally.so/embed/68ljVB?alignLeft=1&amp;hideTitle=1&amp;transparentBackground=1&amp;dynamicHeight=1"
-          loading="lazy"
+          id="tally-embed"
+          src="https://tally.so/embed/68ljVB?alignLeft=1&amp;hideTitle=1&amp;dynamicHeight=1"
+          data-tally-src="https://tally.so/embed/68ljVB?alignLeft=1&amp;hideTitle=1&amp;dynamicHeight=1"
           width="100%"
           height="620"
           frameborder="0"
           marginheight="0"
           marginwidth="0"
           title="Request founding access to Beacon"></iframe>
+
+        <!-- Shown only if the embed genuinely fails to arrive: a content
+             blocker, a locked-down network, an outage at Tally. Beacon's
+             audience is disproportionately the sort of person who runs a
+             blocker, so this path is not an edge case for this site. -->
+        <p class="form-fallback" id="form-fallback" hidden>
+          The form didn’t load — a content blocker or network may be in the way.
+          <a class="link" href="https://tally.so/r/68ljVB?utm_source=site&amp;utm_medium=fallback" target="_blank" rel="noopener">Open it in a new tab instead.</a>
+        </p>
+
         <noscript>
           <p class="form-fallback">
             <a class="btn btn-primary" href="https://tally.so/r/68ljVB?utm_source=site&amp;utm_medium=noscript">Request access</a>
           </p>
         </noscript>
       </div>
+
+      <script>
+        // Carry campaign attribution into the form.
+        //
+        // The form declares utm_source / utm_medium / utm_campaign as
+        // hidden fields, but Tally populates those from the *iframe's*
+        // query string, not the parent page's -- so a visitor arriving
+        // on /?utm_source=tiktok was submitting three empty fields and
+        // every signup looked like direct traffic.
+        //
+        // Runs here, immediately after the frame is parsed, so the src is
+        // rewritten while its first request is typically still in flight.
+        // The markup keeps a working src of its own, so attribution is an
+        // enhancement and never a prerequisite for the form loading.
+        (function () {
+          // Allowlisted: query strings are attacker-supplied, and only
+          // these three correspond to fields the form actually declares.
+          var FIELDS = ['utm_source', 'utm_medium', 'utm_campaign'];
+          var KEY = 'beacon_attr';
+          var attr = {};
+
+          try {
+            var params = new URLSearchParams(window.location.search);
+            FIELDS.forEach(function (k) {
+              var v = params.get(k);
+              if (v) { attr[k] = v.slice(0, 120); }
+            });
+
+            // Someone who detours to Privacy and comes back via the nav
+            // CTA returns without the query string. Remember it for the
+            // session so that visit is still attributed to the campaign.
+            if (Object.keys(attr).length) {
+              sessionStorage.setItem(KEY, JSON.stringify(attr));
+            } else {
+              attr = JSON.parse(sessionStorage.getItem(KEY) || '{}');
+            }
+          } catch (e) {
+            // Private mode, blocked storage, an exotic URL -- attribution
+            // is never worth breaking the form over.
+          }
+
+          var keys = Object.keys(attr).filter(function (k) {
+            return FIELDS.indexOf(k) !== -1 && typeof attr[k] === 'string';
+          });
+          if (!keys.length) return;
+
+          var apply = function (el, prop) {
+            if (!el) return;
+            try {
+              var u = new URL(el[prop], window.location.href);
+              keys.forEach(function (k) { u.searchParams.set(k, attr[k]); });
+              el[prop] = u.toString();
+            } catch (e) {}
+          };
+
+          var frame = document.getElementById('tally-embed');
+          if (frame) {
+            apply(frame, 'src');
+            // Kept in step so Tally's own initialiser, if it ever runs,
+            // does not reinstate an unattributed URL.
+            frame.setAttribute('data-tally-src', frame.src);
+          }
+
+          // The escape hatches should carry the campaign too.
+          document.querySelectorAll('.form-fallback a[href*="tally.so"]')
+            .forEach(function (a) { apply(a, 'href'); });
+        })();
+      </script>
     </div>
   </section>
 
@@ -302,6 +411,44 @@
       });
     }, { rootMargin: '0px 0px -12% 0px', threshold: 0.05 });
     items.forEach(function (el) { io.observe(el); });
+  })();
+</script>
+<script>
+  // Two jobs, both about the frame above being the only thing on the
+  // site that asks for anything.
+  //
+  //  1. Recovery. The `src` is set in the markup, so the form loads on
+  //     its own. Only if that has *not* happened by window load is
+  //     Tally's own initialiser called as a second attempt -- guarded,
+  //     because calling it re-assigns `src` and would otherwise reload
+  //     a form that was already sitting there working.
+  //  2. Honesty. If nothing has rendered after a few seconds, offer a
+  //     way through instead of leaving the reader looking at a blank
+  //     space. If the embed then turns up late, the notice withdraws.
+  (function () {
+    var frame = document.getElementById('tally-embed');
+    var fallback = document.getElementById('form-fallback');
+    if (!frame) return;
+
+    var loaded = false;
+    frame.addEventListener('load', function () {
+      loaded = true;
+      frame.hidden = false;
+      if (fallback) fallback.hidden = true;
+    });
+
+    window.addEventListener('load', function () {
+      if (loaded) return;
+      if (window.Tally && typeof window.Tally.loadEmbeds === 'function') {
+        window.Tally.loadEmbeds();
+      }
+    });
+
+    setTimeout(function () {
+      if (loaded || !fallback) return;
+      frame.hidden = true;
+      fallback.hidden = false;
+    }, 6000);
   })();
 </script>
 <script async src="https://tally.so/widgets/embed.js"></script>
