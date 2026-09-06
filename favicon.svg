@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- The same sphere as .mark in styles.css: light concentrated
+       off-centre, falling to near-black at the rim. Never a flat dot. -->
+  <defs>
+    <radialGradient id="o" cx="36%" cy="32%" r="78%">
+      <stop offset="0"    stop-color="#eef0ff"/>
+      <stop offset="0.20" stop-color="#9ea4ff"/>
+      <stop offset="0.46" stop-color="#5c63ff"/>
+      <stop offset="0.88" stop-color="#16173f"/>
+      <stop offset="1"    stop-color="#0a0a20"/>
+    </radialGradient>
+  </defs>
+  <rect width="32" height="32" fill="#050508"/>
+  <circle cx="16" cy="16" r="13" fill="url(#o)"/>
+  <circle cx="12.4" cy="11.4" r="1.7" fill="#fff" opacity="0.9"/>
+</svg>
